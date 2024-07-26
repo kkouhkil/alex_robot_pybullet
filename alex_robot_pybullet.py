@@ -13,11 +13,11 @@ p.setRealTimeSimulation(0)
 p.loadURDF("plane.urdf", [0, 0, 0], [0, 0, 0, 1])
 
 # load assets
-alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_noHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
+# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_noHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_nubHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_SakeHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240516_Alex_TestStand_FixedHead.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
+alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240516_Alex_TestStand_FixedHead.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240614_Alex_TestStand_FixedHead_BarrettDumbbell.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_LEFT_Barett_RIGHT_Psyonic.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_LEFT_Psyonic_RIGHT_Barett.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
@@ -56,7 +56,7 @@ right_arm_current_end_eff_ori = []
 left_arm_joint_0_idx = 0
 right_arm_joint_0_idx = 0
 
-# joints index finder
+# joint index finder
 for i in range (num_of_joints):
     joint_type = p.getJointInfo(alex_robot, i)
 
