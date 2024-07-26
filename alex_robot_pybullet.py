@@ -9,7 +9,6 @@ p.resetSimulation()
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -9.8)
 p.setRealTimeSimulation(0)
-
 p.loadURDF("plane.urdf", [0, 0, 0], [0, 0, 0, 1])
 
 # load assets
@@ -56,8 +55,10 @@ right_arm_current_end_eff_ori = []
 left_arm_joint_0_idx = 0
 right_arm_joint_0_idx = 0
 
-# joint index finder
+robot_arm_joint_0_idx = []
+
 for i in range (num_of_joints):
+
     joint_type = p.getJointInfo(alex_robot, i)
 
     joint_type = list(joint_type)
@@ -66,16 +67,17 @@ for i in range (num_of_joints):
 
     if joint_type[1] == 'LeftShoulderPitch':
         left_arm_joint_0_idx = i
+        robot_arm_joint_0_idx.append(left_arm_joint_0_idx)
 
     if joint_type[1] == 'RightShoulderPitch':
         right_arm_joint_0_idx = i
-
+        robot_arm_joint_0_idx.append(right_arm_joint_0_idx)
 
 # joint type and limit
 for i in range (num_of_joints):
     joint_type = p.getJointInfo(alex_robot, i)
 
-    if i >= left_arm_joint_0_idx and i < left_arm_joint_0_idx + 7:
+    if i >= robot_arm_joint_0_idx[0] and i < robot_arm_joint_0_idx[0] + 7:
         left_arm_joint_index_vec.append(i)
         left_arm_current_joint_value_vec.append(0)
         left_arm_current_link_value_vec.append(0)
@@ -87,7 +89,7 @@ for i in range (num_of_joints):
         left_arm_joint_upper_limit_vec.append(left_arm_joint_upper_limit)
    
 
-    if i >= right_arm_joint_0_idx and i < right_arm_joint_0_idx + 7:    
+    if i >= robot_arm_joint_0_idx[1] and i < robot_arm_joint_0_idx[1] + 7:    
         right_arm_joint_index_vec.append(i)
         right_arm_current_joint_value_vec.append(0)
         right_arm_current_link_value_vec.append(0)
@@ -100,55 +102,57 @@ for i in range (num_of_joints):
 
     print(joint_type)
 
-print("\n")
+def print_func():
+    print(f"\nleft_arm_joint_0_idx = {robot_arm_joint_0_idx[0]}\nright_arm_joint_0_idx = {robot_arm_joint_0_idx[1]}")
 
-print(left_arm_joint_0_idx)
-print(right_arm_joint_0_idx)
+    print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}")
+    print(f"right_arm_joint_idx = {right_arm_joint_index_vec}")
 
-print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}")
-print(f"right_arm_joint_idx = {right_arm_joint_index_vec}")
+    print("\n")
 
-print("\n")
+    for i in range (len(left_arm_joint_lower_limit_vec)):
+        print(f"left_arm_joint[{i}]_lower_limit = {left_arm_joint_lower_limit_vec[i]} \t left_arm_joint[{i}]_upper_limit = {left_arm_joint_upper_limit_vec[i]}")
 
-for i in range (len(left_arm_joint_lower_limit_vec)):
-    print(f"left_arm_joint[{i}]_lower_limit = {left_arm_joint_lower_limit_vec[i]} \t left_arm_joint[{i}]_upper_limit = {left_arm_joint_upper_limit_vec[i]}")
+    print("\n")
 
-print("\n")
-
-for i in range (len(right_arm_joint_lower_limit_vec)):
-    print(f"right_arm_joint[{i}]_lower_limit = {right_arm_joint_lower_limit_vec[i]} \t right_arm_joint[{i}]_upper_limit = {right_arm_joint_upper_limit_vec[i]}")
-
-print("\n")
+    for i in range (len(right_arm_joint_lower_limit_vec)):
+        print(f"right_arm_joint[{i}]_lower_limit = {right_arm_joint_lower_limit_vec[i]} \t right_arm_joint[{i}]_upper_limit = {right_arm_joint_upper_limit_vec[i]}")
 
 # arm motion generation
 left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
 right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
-for step in range(250):
+def main():
 
-    focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
-    p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
-    p.stepSimulation()
+    for step in range(250):
 
-    for i in range (len(left_arm_joint_lower_limit_vec)):
-        left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])   
-    p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value)   
+        focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
+        p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
+        p.stepSimulation()
 
-    for i in range (len(right_arm_joint_lower_limit_vec)):
-        right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
-    p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value)  
+        for i in range (len(left_arm_joint_lower_limit_vec)):
+            left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])   
+        p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value)   
 
-    left_arm_current_joint_value_vec = p.getJointStates(alex_robot, left_arm_joint_index_vec)
-    left_arm_current_link_value_vec = p.getLinkStates(alex_robot, left_arm_joint_index_vec)
+        for i in range (len(right_arm_joint_lower_limit_vec)):
+            right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
+        p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value)  
 
-    right_arm_current_joint_value_vec = p.getJointStates(alex_robot, right_arm_joint_index_vec)
-    right_arm_current_link_value_vec = p.getLinkStates(alex_robot, right_arm_joint_index_vec)
+        left_arm_current_joint_value_vec = p.getJointStates(alex_robot, left_arm_joint_index_vec)
+        left_arm_current_link_value_vec = p.getLinkStates(alex_robot, left_arm_joint_index_vec)
 
-    left_arm_current_end_eff_pos = left_arm_current_link_value_vec[len(left_arm_joint_lower_limit_vec) - 1][0]
-    left_arm_current_end_eff_ori = left_arm_current_link_value_vec[len(left_arm_joint_lower_limit_vec) - 1][1]
+        right_arm_current_joint_value_vec = p.getJointStates(alex_robot, right_arm_joint_index_vec)
+        right_arm_current_link_value_vec = p.getLinkStates(alex_robot, right_arm_joint_index_vec)
 
-    right_arm_current_end_eff_pos = right_arm_current_link_value_vec[len(right_arm_joint_lower_limit_vec) - 1][0]
-    right_arm_current_end_eff_ori = right_arm_current_link_value_vec[len(right_arm_joint_lower_limit_vec) - 1][1]
+        left_arm_current_end_eff_pos = left_arm_current_link_value_vec[len(left_arm_joint_lower_limit_vec) - 1][0]
+        left_arm_current_end_eff_ori = left_arm_current_link_value_vec[len(left_arm_joint_lower_limit_vec) - 1][1]
 
-    p.stepSimulation()
-    t.sleep(0.25)
+        right_arm_current_end_eff_pos = right_arm_current_link_value_vec[len(right_arm_joint_lower_limit_vec) - 1][0]
+        right_arm_current_end_eff_ori = right_arm_current_link_value_vec[len(right_arm_joint_lower_limit_vec) - 1][1]
+
+        p.stepSimulation()
+        t.sleep(0.25)
+
+if __name__ == "__main__":
+    print_func()
+    main()
