@@ -4,6 +4,7 @@ import pybullet_data
 import time as t
 import numpy as np
 
+# setting up the env properties
 p.connect(p.GUI)
 p.resetSimulation()
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -12,6 +13,7 @@ p.setRealTimeSimulation(0)
 p.loadURDF("plane.urdf", [0, 0, 0], [0, 0, 0, 1])
 
 # load assets
+
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_noHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_nubHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
@@ -28,38 +30,48 @@ obj_of_focus = alex_robot
 num_of_joints = p.getNumJoints(alex_robot)
 print(f"\nnum_of_joints = {num_of_joints}\n")
 
+# global variables definition
+
+# robot arms - lower/upper limit
 left_arm_joint_lower_limit_vec = []
 left_arm_joint_upper_limit_vec = []
 
 right_arm_joint_lower_limit_vec = []
 right_arm_joint_upper_limit_vec = []
 
+# robot arms - joint index
 left_arm_joint_index_vec = []
 right_arm_joint_index_vec = []
 
+# robot arms - joint vectors
 left_arm_current_joint_value_vec = []
 right_arm_current_joint_value_vec = []
 
+# robota arms - current link vec
 left_arm_current_link_value_vec = []
 right_arm_current_link_value_vec = []
 
+# robot arms - current end-effector position
 left_arm_current_end_eff_pos = []
 right_arm_current_end_eff_pos = []
 
+# robot arms - current end-effector orientation
 left_arm_current_end_eff_ori = []
 right_arm_current_end_eff_ori = []
 
+# robot arms - fisrt joint index
 left_arm_joint_0_idx = 0
 right_arm_joint_0_idx = 0
 
+# robot arms - first joint index vector
 robot_arm_joint_0_idx = []
 
-joint_type_global = []
-
+# environment camera visualaizer - function
 def env_camera_visualizer():
     focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
     p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
 
+# robot joint index finder - function 
 def robot_joint_idx_finder(num_of_joints):
 
     for i in range (num_of_joints):
@@ -78,10 +90,7 @@ def robot_joint_idx_finder(num_of_joints):
             right_arm_joint_0_idx = i
             robot_arm_joint_0_idx.append(right_arm_joint_0_idx)
 
-    print("DEBUGG --> ", robot_arm_joint_0_idx)        
-
-robot_joint_idx_finder(num_of_joints)
-
+# robot joint limit finder - function
 def robot_joint_type_limit_finder(num_of_joints):
 
     # joint type and limit
@@ -113,24 +122,7 @@ def robot_joint_type_limit_finder(num_of_joints):
     
         print(joint_type)
 
-def print_func():
-    print(f"\nleft_arm_joint_0_idx = {robot_arm_joint_0_idx[0]}\nright_arm_joint_0_idx = {robot_arm_joint_0_idx[1]}")
-
-    print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}")
-    print(f"right_arm_joint_idx = {right_arm_joint_index_vec}")
-
-    print("\n")
-
-    for i in range (len(left_arm_joint_lower_limit_vec)):
-        print(f"left_arm_joint[{i}]_lower_limit = {left_arm_joint_lower_limit_vec[i]} \t left_arm_joint[{i}]_upper_limit = {left_arm_joint_upper_limit_vec[i]}")
-
-    print("\n")
-
-    for i in range (len(right_arm_joint_lower_limit_vec)):
-        print(f"right_arm_joint[{i}]_lower_limit = {right_arm_joint_lower_limit_vec[i]} \t right_arm_joint[{i}]_upper_limit = {right_arm_joint_upper_limit_vec[i]}")
-
-def main():
-
+def robot_motion_generation():
     for step in range(250):
 
         for i in range (len(left_arm_joint_lower_limit_vec)):
@@ -156,8 +148,25 @@ def main():
         p.stepSimulation()
         t.sleep(0.25)
 
+# printing function
+def print_func():
+    print(f"\nleft_arm_joint_0_idx = {robot_arm_joint_0_idx[0]}\nright_arm_joint_0_idx = {robot_arm_joint_0_idx[1]}")
+
+    print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}")
+    print(f"right_arm_joint_idx = {right_arm_joint_index_vec}")
+
+    print("\n")
+
+    for i in range (len(left_arm_joint_lower_limit_vec)):
+        print(f"left_arm_joint[{i}]_lower_limit = {left_arm_joint_lower_limit_vec[i]} \t left_arm_joint[{i}]_upper_limit = {left_arm_joint_upper_limit_vec[i]}")
+
+    print("\n")
+
+    for i in range (len(right_arm_joint_lower_limit_vec)):
+        print(f"right_arm_joint[{i}]_lower_limit = {right_arm_joint_lower_limit_vec[i]} \t right_arm_joint[{i}]_upper_limit = {right_arm_joint_upper_limit_vec[i]}")
+
 if __name__ == "__main__":
-    
+
     env_camera_visualizer()
     robot_joint_idx_finder(num_of_joints)
     robot_joint_type_limit_finder(num_of_joints)
@@ -167,4 +176,4 @@ if __name__ == "__main__":
     left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
     right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
-    main()
+    robot_motion_generation()
