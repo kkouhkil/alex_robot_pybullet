@@ -24,9 +24,6 @@ alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-mo
 # alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 obj_of_focus = alex_robot
 
-# focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
-# p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
-
 # number of joints
 num_of_joints = p.getNumJoints(alex_robot)
 print(f"\nnum_of_joints = {num_of_joints}\n")
@@ -57,50 +54,64 @@ right_arm_joint_0_idx = 0
 
 robot_arm_joint_0_idx = []
 
-for i in range (num_of_joints):
+joint_type_global = []
 
-    joint_type = p.getJointInfo(alex_robot, i)
+def env_camera_visualizer():
+    focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
+    p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
 
-    joint_type = list(joint_type)
-    joint_type[1] = joint_type[1].decode("utf-8")
-    joint_type = tuple(joint_type)
+def robot_joint_idx_finder(num_of_joints):
 
-    if joint_type[1] == 'LeftShoulderPitch':
-        left_arm_joint_0_idx = i
-        robot_arm_joint_0_idx.append(left_arm_joint_0_idx)
+    for i in range (num_of_joints):
 
-    if joint_type[1] == 'RightShoulderPitch':
-        right_arm_joint_0_idx = i
-        robot_arm_joint_0_idx.append(right_arm_joint_0_idx)
+        joint_type = p.getJointInfo(alex_robot, i)
 
-# joint type and limit
-for i in range (num_of_joints):
-    joint_type = p.getJointInfo(alex_robot, i)
+        joint_type = list(joint_type)
+        joint_type[1] = joint_type[1].decode("utf-8")
+        joint_type = tuple(joint_type)
 
-    if i >= robot_arm_joint_0_idx[0] and i < robot_arm_joint_0_idx[0] + 7:
-        left_arm_joint_index_vec.append(i)
-        left_arm_current_joint_value_vec.append(0)
-        left_arm_current_link_value_vec.append(0)
+        if joint_type[1] == 'LeftShoulderPitch':
+            left_arm_joint_0_idx = i
+            robot_arm_joint_0_idx.append(left_arm_joint_0_idx)
 
-        left_arm_joint_lower_limit = joint_type[8]
-        left_arm_joint_lower_limit_vec.append(left_arm_joint_lower_limit)
+        if joint_type[1] == 'RightShoulderPitch':
+            right_arm_joint_0_idx = i
+            robot_arm_joint_0_idx.append(right_arm_joint_0_idx)
 
-        left_arm_joint_upper_limit = joint_type[9]
-        left_arm_joint_upper_limit_vec.append(left_arm_joint_upper_limit)
-   
+    print("DEBUGG --> ", robot_arm_joint_0_idx)        
 
-    if i >= robot_arm_joint_0_idx[1] and i < robot_arm_joint_0_idx[1] + 7:    
-        right_arm_joint_index_vec.append(i)
-        right_arm_current_joint_value_vec.append(0)
-        right_arm_current_link_value_vec.append(0)
+robot_joint_idx_finder(num_of_joints)
 
-        right_arm_joint_lower_limit = joint_type[8]
-        right_arm_joint_lower_limit_vec.append(right_arm_joint_lower_limit)
+def robot_joint_type_limit_finder(num_of_joints):
 
-        right_arm_joint_upper_limit = joint_type[9]
-        right_arm_joint_upper_limit_vec.append(right_arm_joint_upper_limit)
-
-    print(joint_type)
+    # joint type and limit
+    for i in range (num_of_joints):
+    
+        joint_type = p.getJointInfo(alex_robot, i)
+    
+        if i >= robot_arm_joint_0_idx[0] and i < robot_arm_joint_0_idx[0] + 7:
+            left_arm_joint_index_vec.append(i)
+            left_arm_current_joint_value_vec.append(0)
+            left_arm_current_link_value_vec.append(0)
+    
+            left_arm_joint_lower_limit = joint_type[8]
+            left_arm_joint_lower_limit_vec.append(left_arm_joint_lower_limit)
+    
+            left_arm_joint_upper_limit = joint_type[9]
+            left_arm_joint_upper_limit_vec.append(left_arm_joint_upper_limit)
+    
+        if i >= robot_arm_joint_0_idx[1] and i < robot_arm_joint_0_idx[1] + 7:    
+            right_arm_joint_index_vec.append(i)
+            right_arm_current_joint_value_vec.append(0)
+            right_arm_current_link_value_vec.append(0)
+    
+            right_arm_joint_lower_limit = joint_type[8]
+            right_arm_joint_lower_limit_vec.append(right_arm_joint_lower_limit)
+    
+            right_arm_joint_upper_limit = joint_type[9]
+            right_arm_joint_upper_limit_vec.append(right_arm_joint_upper_limit)
+    
+        print(joint_type)
 
 def print_func():
     print(f"\nleft_arm_joint_0_idx = {robot_arm_joint_0_idx[0]}\nright_arm_joint_0_idx = {robot_arm_joint_0_idx[1]}")
@@ -118,17 +129,9 @@ def print_func():
     for i in range (len(right_arm_joint_lower_limit_vec)):
         print(f"right_arm_joint[{i}]_lower_limit = {right_arm_joint_lower_limit_vec[i]} \t right_arm_joint[{i}]_upper_limit = {right_arm_joint_upper_limit_vec[i]}")
 
-# arm motion generation
-left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
-right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
-
 def main():
 
     for step in range(250):
-
-        focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
-        p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
-        p.stepSimulation()
 
         for i in range (len(left_arm_joint_lower_limit_vec)):
             left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])   
@@ -154,5 +157,14 @@ def main():
         t.sleep(0.25)
 
 if __name__ == "__main__":
+    
+    env_camera_visualizer()
+    robot_joint_idx_finder(num_of_joints)
+    robot_joint_type_limit_finder(num_of_joints)
     print_func()
+
+    # arm motion generation
+    left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
+    right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
+
     main()
