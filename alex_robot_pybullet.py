@@ -31,6 +31,7 @@ num_of_joints = p.getNumJoints(alex_robot)
 print(f"\nnum_of_joints = {num_of_joints}\n")
 
 # global variables definition
+joint_type_global = (0) * num_of_joints
 
 # robot arms - lower/upper limit
 left_arm_joint_lower_limit_vec = []
@@ -80,6 +81,7 @@ def robot_joint_idx_finder(num_of_joints):
 
         joint_type = list(joint_type)
         joint_type[1] = joint_type[1].decode("utf-8")
+
         joint_type = tuple(joint_type)
 
         if joint_type[1] == 'LeftShoulderPitch':
@@ -123,6 +125,11 @@ def robot_joint_type_limit_finder(num_of_joints):
         print(joint_type)
 
 def robot_motion_generation():
+    
+    #  arm motion generation
+    left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
+    right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
+
     for step in range(250):
 
         for i in range (len(left_arm_joint_lower_limit_vec)):
@@ -171,9 +178,5 @@ if __name__ == "__main__":
     robot_joint_idx_finder(num_of_joints)
     robot_joint_type_limit_finder(num_of_joints)
     print_func()
-
-    # arm motion generation
-    left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
-    right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
     robot_motion_generation()
