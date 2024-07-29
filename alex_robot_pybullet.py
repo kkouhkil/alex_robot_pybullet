@@ -4,6 +4,8 @@ import pybullet_data
 import time as t
 import numpy as np
 
+from collections import namedtuple
+
 # setting up the env properties
 p.connect(p.GUI)
 p.resetSimulation()
@@ -44,11 +46,15 @@ right_arm_joint_upper_limit_vec = []
 left_arm_joint_index_vec = []
 right_arm_joint_index_vec = []
 
-# robot arms - joint vectors
+# robot arms - current joint value vectors
 left_arm_current_joint_value_vec = []
 right_arm_current_joint_value_vec = []
 
-# robota arms - current link vec
+# robot arms - desired joint value vectors
+left_arm_desired_joint_value_vec = []
+right_arm_desired_joint_value_vec = []
+
+# robot arms - current link vec
 left_arm_current_link_value_vec = []
 right_arm_current_link_value_vec = []
 
@@ -70,7 +76,38 @@ robot_arm_joint_0_idx = []
 # environment camera visualaizer - function
 def env_camera_visualizer():
     focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
-    p.resetDebugVisualizerCamera(cameraDistance = 2, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
+    p.resetDebugVisualizerCamera(cameraDistance = 2.25, cameraYaw = 90, cameraPitch = -30, cameraTargetPosition = focus_position)
+
+def interactive_env_creation():
+
+    # Define the size of the box
+    box_size = [0.25, 0.25, 1]  # half extents in x, y, z
+
+    # Create a visual shape for the box
+    visual_shape_id = p.createVisualShape(
+        shapeType=p.GEOM_BOX,
+        halfExtents=box_size,
+        rgbaColor=[0.75, 0.75, 0.75, 1],  # red color
+    )
+
+    # Create a collision shape for the box
+    collision_shape_id = p.createCollisionShape(
+        shapeType=p.GEOM_BOX,
+        halfExtents=box_size,
+    )
+
+    # Define the position and orientation of the box
+    start_pos = [0, 0, 0]
+    start_orientation = p.getQuaternionFromEuler([0, 0, 0])
+
+    # Create a multi-body with the visual and collision shape
+    box_id = p.createMultiBody(
+        baseMass=0,  # mass of the box
+        baseCollisionShapeIndex=collision_shape_id,
+        baseVisualShapeIndex=visual_shape_id,
+        basePosition=start_pos,
+        baseOrientation=start_orientation,
+    )
 
 # robot joint index finder - function 
 def robot_joint_idx_finder(num_of_joints):
@@ -133,11 +170,12 @@ def robot_motion_generation():
     for step in range(250):
 
         for i in range (len(left_arm_joint_lower_limit_vec)):
-            left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])   
-        p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value)   
+            left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])    
 
         for i in range (len(right_arm_joint_lower_limit_vec)):
             right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
+        
+        p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value)  
         p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value)  
 
         left_arm_current_joint_value_vec = p.getJointStates(alex_robot, left_arm_joint_index_vec)
@@ -153,7 +191,7 @@ def robot_motion_generation():
         right_arm_current_end_eff_ori = right_arm_current_link_value_vec[len(right_arm_joint_lower_limit_vec) - 1][1]
 
         p.stepSimulation()
-        t.sleep(0.25)
+        t.sleep(0.1)
 
 # printing function
 def print_func():
@@ -175,6 +213,7 @@ def print_func():
 if __name__ == "__main__":
 
     env_camera_visualizer()
+    interactive_env_creation()
     robot_joint_idx_finder(num_of_joints)
     robot_joint_type_limit_finder(num_of_joints)
     print_func()
