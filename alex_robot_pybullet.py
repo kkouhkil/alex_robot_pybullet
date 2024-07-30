@@ -176,8 +176,8 @@ def robot_motion_generation():
     left_des_arm_position = [0.25, 0.30, 1.75]
     right_des_arm_position = [0.25, -0.30, 1.75]
 
-    left_arm_des_orientation = p.getQuaternionFromEuler([-3.14, 0, 0])
-    right_arm_des_orientation = p.getQuaternionFromEuler([-3.14, 0, 0])
+    left_arm_des_orientation = p.getQuaternionFromEuler([-math.pi/2, 0, 0])
+    right_arm_des_orientation = p.getQuaternionFromEuler([math.pi/2, 0, 0])
 
     left_arm_des_pose = [left_des_arm_position, left_arm_des_orientation]
     right_arm_des_pose = [right_des_arm_position, right_arm_des_orientation]
@@ -186,22 +186,26 @@ def robot_motion_generation():
 
     for step in range(250):
 
-        # random motion generation
-        # for i in range (len(left_arm_joint_lower_limit_vec)):
-        #     left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])    
+        mode_select = 2
 
-        # for i in range (len(right_arm_joint_lower_limit_vec)):
-        #     right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
+        if mode_select == 1:
+            # random motion generation
+            for i in range (len(left_arm_joint_lower_limit_vec)):
+                left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])    
 
-        # p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
-        # p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[0:7])  
+            for i in range (len(right_arm_joint_lower_limit_vec)):
+                right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
 
-        # desired arm pose - inverse kinematics method
-        left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
-        right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
+            p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
+            p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[0:7])  
 
-        p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
-        p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[7:14])  
+        if mode_select == 2:
+            # desired arm pose - inverse kinematics method
+            left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
+            right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
+
+            p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
+            p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[7:14])  
 
         left_arm_current_joint_value_vec = p.getJointStates(alex_robot, left_arm_joint_index_vec)
         left_arm_current_link_value_vec = p.getLinkStates(alex_robot, left_arm_joint_index_vec)
@@ -244,7 +248,7 @@ def print_func():
 if __name__ == "__main__":
 
     env_camera_visualizer()
-    # interactive_env_creation()
+    interactive_env_creation()
 
     robot_joint_idx_finder(num_of_joints)
     robot_joint_type_limit_finder(num_of_joints)
