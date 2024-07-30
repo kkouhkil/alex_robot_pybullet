@@ -3,6 +3,7 @@ import pybullet_data
 
 import time as t
 import numpy as np
+import math
 
 from collections import namedtuple
 
@@ -31,6 +32,11 @@ obj_of_focus = alex_robot
 # number of joints
 num_of_joints = p.getNumJoints(alex_robot)
 print(f"\nnum_of_joints = {num_of_joints}\n")
+
+# arm motion generation modes
+# select 1: random robot arm motion generation
+# select 2: desired target robot arm motion generation 
+mode_select = 1
 
 # global variables definition
 joint_type_global = (0) * num_of_joints
@@ -162,21 +168,40 @@ def robot_joint_type_limit_finder(num_of_joints):
         print(joint_type)
 
 def robot_motion_generation():
-    
+
     #  arm motion generation
     left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
     right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
+    left_des_arm_position = [0.25, 0.30, 1.75]
+    right_des_arm_position = [0.25, -0.30, 1.75]
+
+    left_arm_des_orientation = p.getQuaternionFromEuler([-3.14, 0, 0])
+    right_arm_des_orientation = p.getQuaternionFromEuler([-3.14, 0, 0])
+
+    left_arm_des_pose = [left_des_arm_position, left_arm_des_orientation]
+    right_arm_des_pose = [right_des_arm_position, right_arm_des_orientation]
+
+    print(f"\nleft_arm_des_pose = {left_arm_des_pose}\nright_arm_des_pose = {right_arm_des_pose}\n")
+
     for step in range(250):
 
-        for i in range (len(left_arm_joint_lower_limit_vec)):
-            left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])    
+        # random motion generation
+        # for i in range (len(left_arm_joint_lower_limit_vec)):
+        #     left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])    
 
-        for i in range (len(right_arm_joint_lower_limit_vec)):
-            right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
-        
-        p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value)  
-        p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value)  
+        # for i in range (len(right_arm_joint_lower_limit_vec)):
+        #     right_arm_desired_joints_value[i] = np.random.uniform(right_arm_joint_lower_limit_vec[i], right_arm_joint_upper_limit_vec[i])   
+
+        # p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
+        # p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[0:7])  
+
+        # desired arm pose - inverse kinematics method
+        left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
+        right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
+
+        p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
+        p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[7:14])  
 
         left_arm_current_joint_value_vec = p.getJointStates(alex_robot, left_arm_joint_index_vec)
         left_arm_current_link_value_vec = p.getLinkStates(alex_robot, left_arm_joint_index_vec)
@@ -192,6 +217,12 @@ def robot_motion_generation():
 
         p.stepSimulation()
         t.sleep(0.1)
+
+        # print(left_arm_desired_joints_value[:])
+        # print(right_arm_desired_joints_value[:])
+
+        print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
+        print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
 
 # printing function
 def print_func():
@@ -213,9 +244,12 @@ def print_func():
 if __name__ == "__main__":
 
     env_camera_visualizer()
-    interactive_env_creation()
+    # interactive_env_creation()
+
     robot_joint_idx_finder(num_of_joints)
     robot_joint_type_limit_finder(num_of_joints)
-    print_func()
 
+    print_func()
+    
     robot_motion_generation()
+   
