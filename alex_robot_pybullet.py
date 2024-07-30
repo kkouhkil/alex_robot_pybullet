@@ -169,12 +169,14 @@ def robot_joint_type_limit_finder(num_of_joints):
 
 def robot_motion_generation():
 
+    gt0 = t.time()
+    gt = 0
     #  arm motion generation
     left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
     right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
-    left_des_arm_position = [0.25, 0.30, 1.75]
-    right_des_arm_position = [0.25, -0.30, 1.75]
+    left_des_arm_position = [0.25, 0.25, 1.75]
+    right_des_arm_position = [0.25, -0.25, 1.75]
 
     left_arm_des_orientation = p.getQuaternionFromEuler([-math.pi/2, 0, 0])
     right_arm_des_orientation = p.getQuaternionFromEuler([math.pi/2, 0, 0])
@@ -184,11 +186,14 @@ def robot_motion_generation():
 
     print(f"\nleft_arm_des_pose = {left_arm_des_pose}\nright_arm_des_pose = {right_arm_des_pose}\n")
 
-    for step in range(250):
+    for step in range(1000):
 
-        mode_select = 2
+        gt = t.time() - gt0
 
-        if mode_select == 1:
+        mode_select = 1
+
+        if mode_select == 0:
+
             # random motion generation
             for i in range (len(left_arm_joint_lower_limit_vec)):
                 left_arm_desired_joints_value[i] = np.random.uniform(left_arm_joint_lower_limit_vec[i], left_arm_joint_upper_limit_vec[i])    
@@ -199,7 +204,20 @@ def robot_motion_generation():
             p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
             p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[0:7])  
 
+        if mode_select == 1:
+
+            # desired arm pose - inverse kinematics method
+            left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
+            right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
+
+            p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
+            p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[7:14])  
+
         if mode_select == 2:
+            
+            left_des_arm_position[0] = left_des_arm_position[1] + 0.05 * math.sin(gt)
+            right_des_arm_position[0] = right_des_arm_position[1] - 0.05 * math.sin(gt)
+
             # desired arm pose - inverse kinematics method
             left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
             right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
@@ -222,11 +240,12 @@ def robot_motion_generation():
         p.stepSimulation()
         t.sleep(0.1)
 
+        
         # print(left_arm_desired_joints_value[:])
         # print(right_arm_desired_joints_value[:])
 
-        print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
-        print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
+        # print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
+        # print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
 
 # printing function
 def print_func():
