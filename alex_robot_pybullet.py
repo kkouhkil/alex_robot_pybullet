@@ -79,6 +79,9 @@ right_arm_joint_0_idx = 0
 # robot arms - first joint index vector
 robot_arm_joint_0_idx = []
 
+gt0_global = t.time()
+gt_global = 0
+
 # environment camera visualaizer - function
 def env_camera_visualizer():
     focus_position, _ = p.getBasePositionAndOrientation(alex_robot)
@@ -169,14 +172,13 @@ def robot_joint_type_limit_finder(num_of_joints):
 
 def robot_motion_generation():
 
-    gt0 = t.time()
-    gt = 0
+    
     #  arm motion generation
     left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
     right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
-    left_des_arm_position = [0.25, 0.25, 1.75]
-    right_des_arm_position = [0.25, -0.25, 1.75]
+    left_des_arm_position = [0.25, 0.35, 1.35]
+    right_des_arm_position = [0.25, -0.35, 1.35]
 
     left_arm_des_orientation = p.getQuaternionFromEuler([-math.pi/2, 0, 0])
     right_arm_des_orientation = p.getQuaternionFromEuler([math.pi/2, 0, 0])
@@ -188,9 +190,9 @@ def robot_motion_generation():
 
     for step in range(1000):
 
-        gt = t.time() - gt0
+        gt_global = t.time() - gt0_global
 
-        mode_select = 1
+        mode_select = 2
 
         if mode_select == 0:
 
@@ -215,8 +217,8 @@ def robot_motion_generation():
 
         if mode_select == 2:
             
-            left_des_arm_position[0] = left_des_arm_position[1] + 0.05 * math.sin(gt)
-            right_des_arm_position[0] = right_des_arm_position[1] - 0.05 * math.sin(gt)
+            left_des_arm_position[1] = left_des_arm_position[1] + 0.0025 * math.sin(0.5 * gt_global)
+            right_des_arm_position[1] = right_des_arm_position[1] - 0.0025 * math.sin(0.5 * gt_global)
 
             # desired arm pose - inverse kinematics method
             left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
@@ -240,7 +242,9 @@ def robot_motion_generation():
         p.stepSimulation()
         t.sleep(0.1)
 
-        
+        # print(f"time = {gt_global}")
+        print(left_des_arm_position[1])
+
         # print(left_arm_desired_joints_value[:])
         # print(right_arm_desired_joints_value[:])
 
