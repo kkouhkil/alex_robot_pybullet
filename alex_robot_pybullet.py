@@ -90,7 +90,7 @@ def env_camera_visualizer():
 def interactive_env_creation():
 
     # Define the size of the box
-    box_size = [0.25, 0.25, 1]  # half extents in x, y, z
+    box_size = [0.20, 0.20, 1]  # half extents in x, y, z
 
     # Create a visual shape for the box
     visual_shape_id = p.createVisualShape(
@@ -177,6 +177,9 @@ def robot_motion_generation():
     left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
     right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
 
+    left_initial_arm_position = [0.25, 0.35, 1.4]
+    right_initial_arm_position = [0.25, -0.35, 1.4]
+
     left_des_arm_position = [0.25, 0.35, 1.4]
     right_des_arm_position = [0.25, -0.35, 1.4]
 
@@ -192,9 +195,13 @@ def robot_motion_generation():
 
         gt_global = t.time() - gt0_global
 
-        mode_select = 1
-        if gt_global >= 10:
+        mode_select = -1
+        if gt_global >= 5:
+            mode_select = 1
+        if gt_global >= 15:
             mode_select = 2
+        if gt_global >= 45:
+            mode_select = 1
 
         if mode_select == 0:
 
@@ -211,8 +218,8 @@ def robot_motion_generation():
         if mode_select == 1:
 
             # desired arm pose - inverse kinematics method
-            left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_arm_des_pose[0], left_arm_des_pose[1])
-            right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
+            left_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, left_arm_joint_index_vec[-1], left_initial_arm_position, left_arm_des_pose[1])
+            right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_initial_arm_position, right_arm_des_pose[1])
 
             p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
             p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[7:14])  
@@ -250,11 +257,11 @@ def robot_motion_generation():
 
         print(f"\ntime = {gt_global}\n")
 
-        # print(left_arm_desired_joints_value[:])
-        # print(right_arm_desired_joints_value[:])
+        # # print(left_arm_desired_joints_value[:])
+        # # print(right_arm_desired_joints_value[:])
 
-        print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
-        print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
+        # print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
+        # print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
 
 # printing function
 def print_func():
