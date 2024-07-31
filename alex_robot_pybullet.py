@@ -172,7 +172,6 @@ def robot_joint_type_limit_finder(num_of_joints):
 
 def robot_motion_generation():
 
-    
     #  arm motion generation
     left_arm_desired_joints_value = [0] * len(left_arm_joint_lower_limit_vec)
     right_arm_desired_joints_value = [0] * len(right_arm_joint_lower_limit_vec)
@@ -260,8 +259,8 @@ def robot_motion_generation():
         # # print(left_arm_desired_joints_value[:])
         # # print(right_arm_desired_joints_value[:])
 
-        # print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
-        # print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
+        print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
+        print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
 
 # printing function
 def print_func():
