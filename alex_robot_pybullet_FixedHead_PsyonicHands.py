@@ -199,13 +199,15 @@ def robot_motion_generation():
 
         gt_global = t.time() - gt0_global
 
-        mode_select = -1
-        if gt_global >= 5:
-            mode_select = 1
-        if gt_global >= 15:
-            mode_select = 2
-        if gt_global >= 45:
-            mode_select = 1
+        mode_select = 1
+
+        # mode_select = -1
+        # if gt_global >= 5:
+        #     mode_select = 1
+        # if gt_global >= 15:
+        #     mode_select = 2
+        # if gt_global >= 45:
+        #     mode_select = 1
 
         if mode_select == 0:
 
@@ -242,7 +244,7 @@ def robot_motion_generation():
             right_arm_desired_joints_value = p.calculateInverseKinematics(alex_robot, right_arm_joint_index_vec[-1], right_arm_des_pose[0], right_arm_des_pose[1])
 
             p.setJointMotorControlArray(alex_robot, left_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = left_arm_desired_joints_value[0:7])  
-            p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[7:14])  
+            p.setJointMotorControlArray(alex_robot, right_arm_joint_index_vec, p.POSITION_CONTROL, targetPositions = right_arm_desired_joints_value[17:24])  
 
         left_arm_current_joint_value_vec = p.getJointStates(alex_robot, left_arm_joint_index_vec)
         left_arm_current_link_value_vec = p.getLinkStates(alex_robot, left_arm_joint_index_vec)
@@ -261,17 +263,17 @@ def robot_motion_generation():
 
         print(f"\ntime = {gt_global}\n")
 
-        # print(left_arm_desired_joints_value[:])
-        # print(right_arm_desired_joints_value[:])
+        print(f"left_arm_desired_joints_value = {left_arm_desired_joints_value[:]}")
+        print(f"right_arm_desired_joints_value = {right_arm_desired_joints_value[:]}")
 
-        print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
-        print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
+        # print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
+        # print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
 
 # printing function
 def print_func():
     print(f"\nleft_arm_joint_0_idx = {robot_arm_joint_0_idx[0]}\nright_arm_joint_0_idx = {robot_arm_joint_0_idx[1]}")
 
-    print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}")
+    print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}\n")
     print(f"right_arm_joint_idx = {right_arm_joint_index_vec}")
 
     print("\n")
