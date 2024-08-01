@@ -123,7 +123,7 @@ def interactive_env_creation():
         baseOrientation=start_orientation,
     )
 
-    box_2_size = [0.25, 0.5, 1.25]  # half extents in x, y, z
+    box_2_size = [0.25, 0.5, 1.0]  # half extents in x, y, z
 
     # Create a visual shape for the box - 2
     visual_shape_2_id = p.createVisualShape(
