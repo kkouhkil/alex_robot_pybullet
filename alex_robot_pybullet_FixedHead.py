@@ -16,25 +16,12 @@ p.setRealTimeSimulation(0)
 p.loadURDF("plane.urdf", [0, 0, 0], [0, 0, 0, 1])
 
 # load assets
+# alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
+# alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
+# alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead_nubHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_noHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_nubHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240109_Alex_SakeHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-
-alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240516_Alex_TestStand_FixedHead.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240516_Alex_TestStand_FixedHead_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240614_Alex_TestStand_FixedHead_BarrettDumbbell.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_LEFT_Barett_RIGHT_Psyonic.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_LEFT_Psyonic_RIGHT_Barett.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_NoHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-
-# alex_robot = p.loadURDF("/home/keyhan/Documents/boardwalk_robotics/alex-robot-models/alex_description/urdf/20240619_Alex_TestStand_FixedHead_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-obj_of_focus = alex_robot
+# load assets - new URDF changes
+alex_robot = p.loadURDF("/home/keyhan/alex-robot-models/alex_description/urdf/20240808_Alex_Spineless_NoHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 
 # number of joints
 num_of_joints = p.getNumJoints(alex_robot)
@@ -43,7 +30,7 @@ print(f"\nnum_of_joints = {num_of_joints}\n")
 # arm motion generation modes
 # select 1: random robot arm motion generation
 # select 2: desired target robot arm motion generation 
-mode_select = 1
+
 
 # global variables definition
 joint_type_global = (0) * num_of_joints
@@ -58,6 +45,9 @@ right_arm_joint_upper_limit_vec = []
 # robot arms - joint index
 left_arm_joint_index_vec = []
 right_arm_joint_index_vec = []
+
+left_arm_joint_name_vec = []
+right_arm_joint_name_vec = []
 
 # robot arms - current joint value vectors
 left_arm_current_joint_value_vec = []
@@ -140,7 +130,7 @@ def interactive_env_creation():
         halfExtents=box_2_size,
     )
 
-    # Define the position and orientation of the box - 1
+    # Define the position and orientation of the box - 2
     start_2_pos = [0.5, 0, 0]
     start_2_orientation = p.getQuaternionFromEuler([0, 0, 0])
 
@@ -151,6 +141,34 @@ def interactive_env_creation():
         baseVisualShapeIndex=visual_shape_2_id,
         basePosition=start_2_pos,
         baseOrientation=start_2_orientation,
+    )
+
+    box_3_size = [0.125, 0.125, 0.125]  # half extents in x, y, z
+
+    # Create a visual shape for the box - 3
+    visual_shape_3_id = p.createVisualShape(
+        shapeType=p.GEOM_BOX,
+        halfExtents=box_3_size,
+        rgbaColor=[1.0, 0.0, 0.0, 1],  # blue color
+    )
+
+    # Create a collision shape for the box - 3
+    collision_shape_3_id = p.createCollisionShape(
+        shapeType=p.GEOM_BOX,
+        halfExtents=box_3_size,
+    )
+
+    # Define the position and orientation of the box - 3
+    start_3_pos = [0.3, 0.0, 1.05]
+    start_3_orientation = p.getQuaternionFromEuler([0, 0, 0])
+
+    # Create a multi-body with the visual and collision shape
+    box_3_id = p.createMultiBody(
+        baseMass=1.0,  # mass of the box
+        baseCollisionShapeIndex=collision_shape_3_id,
+        baseVisualShapeIndex=visual_shape_3_id,
+        basePosition=start_3_pos,
+        baseOrientation=start_3_orientation,
     )
 
 # robot joint index finder - function 
@@ -183,6 +201,7 @@ def robot_joint_type_limit_finder(num_of_joints):
     
         if i >= robot_arm_joint_0_idx[0] and i < robot_arm_joint_0_idx[0] + 7:
             left_arm_joint_index_vec.append(i)
+            left_arm_joint_name_vec.append(joint_type[1])
             left_arm_current_joint_value_vec.append(0)
             left_arm_current_link_value_vec.append(0)
     
@@ -194,6 +213,7 @@ def robot_joint_type_limit_finder(num_of_joints):
     
         if i >= robot_arm_joint_0_idx[1] and i < robot_arm_joint_0_idx[1] + 7:    
             right_arm_joint_index_vec.append(i)
+            right_arm_joint_name_vec.append(joint_type[1])
             right_arm_current_joint_value_vec.append(0)
             right_arm_current_link_value_vec.append(0)
     
@@ -229,13 +249,14 @@ def robot_motion_generation():
 
         gt_global = t.time() - gt0_global
 
+        # trajectory tracking
         mode_select = -1
         if gt_global >= 5:
             mode_select = 1
-        if gt_global >= 15:
-            mode_select = 2
-        if gt_global >= 45:
-            mode_select = 1
+        # if gt_global >= 15:
+        #     mode_select = 2
+        # if gt_global >= 45:
+        #     mode_select = 1
 
         if mode_select == 0:
 
@@ -294,15 +315,22 @@ def robot_motion_generation():
         # print(left_arm_desired_joints_value[:])
         # print(right_arm_desired_joints_value[:])
 
-        print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
-        print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
+        # print(f"left_arm_cur_end_eff_pos: {left_arm_current_end_eff_pos}\nleft_arm_cur_end_eff_ori: {left_arm_current_end_eff_ori}\n")
+        # print(f"right_arm_cur_end_eff_pos: {right_arm_current_end_eff_pos}\nright_arm_cur_end_eff_ori: {right_arm_current_end_eff_ori}\n")
+
+        # print(f"left_arm_des_joint_value: {left_arm_desired_joints_value[0:7]}\nright_arm_des_joint_value: {right_arm_desired_joints_value[7:14]}\n")
+
+
 
 # printing function
 def print_func():
     print(f"\nleft_arm_joint_0_idx = {robot_arm_joint_0_idx[0]}\nright_arm_joint_0_idx = {robot_arm_joint_0_idx[1]}")
 
     print(f"\nleft_arm_joint_idx = {left_arm_joint_index_vec}")
-    print(f"right_arm_joint_idx = {right_arm_joint_index_vec}")
+    print(f"\nleft_arm_joint_name_vec = {left_arm_joint_name_vec}")
+
+    print(f"\nright_arm_joint_idx = {right_arm_joint_index_vec}")
+    print(f"\nright_arm_joint_name_vec = {right_arm_joint_name_vec}")
 
     print("\n")
 
