@@ -16,8 +16,8 @@ p.setRealTimeSimulation(0)
 p.loadURDF("plane.urdf", [0, 0, 0], [0, 0, 0, 1])
 
 # load assets
-# alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
-alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
+alex_robot = p.loadURDF("/home/keyhan/git/alex-robot-models/alex_description/urdf/Alex_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
+# alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 # alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240516_Alex_TestStand_FixedHead_nubHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
 
 # alex_robot = p.loadURDF("/home/keyhan/git/alex_robot_models/alex_description/urdf/20240109_Alex_PsyonicHands.urdf", [0, 0, 1], [0, 0, 0, 1], useFixedBase = True)
